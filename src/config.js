@@ -44,3 +44,18 @@ export const SYSTEM_FILES = ['.ds_store', 'thumbs.db', 'desktop.ini'];
 export const COPY_WORDS = ['копия', 'copy', '-'];
 
 export const HASH_ALGORITHM = 'sha256';
+
+export const BOM = '\uFEFF';
+
+export const OUTPUT_FILES = {
+  registry: 'registry.csv',
+  contacts: 'contacts.csv',
+  reportText: 'report.txt',
+  reportJson: 'report.json',
+};
+
+export const REGISTRY_COLUMNS = [
+  'путь', 'имя', 'тип', 'размер', 'хеш', 'статус', 'основная копия', 'строк', 'колонки',
+];
+
+export const LIST_SEPARATOR = ', ';
