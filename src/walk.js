@@ -8,8 +8,6 @@ const describeFile = (filePath) => ({
   size: fs.statSync(filePath).size,
 });
 
-// Единственное место, где программа обходит папку: им пользуются обе команды.
-// Встретив вложенную папку, функция зовёт себя для неё — глубина не ограничена.
 const listFiles = (dir) => fs.readdirSync(dir, { withFileTypes: true })
   .flatMap((entry) => {
     const entryPath = path.join(dir, entry.name);

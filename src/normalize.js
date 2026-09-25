@@ -8,7 +8,6 @@ const isEmpty = (value) => {
   return text === '' || EMPTY_PLACEHOLDERS.includes(text.toLowerCase());
 };
 
-// 8-921-555-14-95, +7 (921) 555-14-95, 9215551495 → 79215551495.
 export const normalizePhone = (value) => {
   if (isEmpty(value)) {
     return EMPTY;

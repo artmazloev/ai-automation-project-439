@@ -3,10 +3,8 @@ import asTable from 'as-table';
 import { formatFilesSummary } from './files.js';
 import { formatContactsTotals, listUnmappedColumns } from './contacts.js';
 import { REPORT_JSON_INDENT, STATUSES } from './config.js';
+import { byPath, sum } from './utils.js';
 
-const sum = (numbers) => numbers.reduce((total, number) => total + number, 0);
-
-// Отчёт описывает папку целиком, поэтому собирается из обеих половин разбора.
 const collectReportData = ({ dir, files, contacts }) => {
   const relative = (filePath) => path.relative(dir, filePath);
   const byStatus = (status) => files.files
@@ -15,7 +13,7 @@ const collectReportData = ({ dir, files, contacts }) => {
   const groups = files.groups.map(({ primary, copies }) => ({
     files: [primary, ...copies]
       .map((file) => ({ path: relative(file.path), size: file.size }))
-      .toSorted((a, b) => (a.path < b.path ? -1 : Number(a.path > b.path))),
+      .toSorted(byPath),
     extraSize: sum(copies.map((copy) => copy.size)),
   }));
   return {
@@ -69,7 +67,7 @@ export const buildTextReport = (analysis) => {
     '',
     `Можно удалить (${data.files.toDelete.length})`,
     '',
-    'Посторонние файлы: это не документы компании, программа их пропустила.',
+    'Это не документы компании, программа их пропустила.',
     '',
     ...fileList(data.files.toDelete),
     '',
@@ -77,7 +75,7 @@ export const buildTextReport = (analysis) => {
     '',
     `Копий: ${duplicates.copies} в ${duplicates.groups} группах, освободится места: ${duplicates.extraSize} байт`,
     '',
-    'Какую копию из группы оставить, решает человек. Лишний размер — сумма размеров группы без одной копии.',
+    'Какую копию оставить, решает человек. Лишний размер считается без одной копии в группе.',
     ...duplicates.list.flatMap((group, index) => [
       '',
       `Группа ${index + 1}, лишний размер: ${group.extraSize} байт`,

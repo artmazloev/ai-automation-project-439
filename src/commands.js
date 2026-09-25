@@ -4,7 +4,6 @@ import { buildJsonReport, buildTextReport } from './report.js';
 import writeOutput from './output.js';
 import { OUTPUT_FILES } from './config.js';
 
-// Обе половины считаются один раз: числа идут и в терминал, и в оба отчёта.
 const analyze = (dir) => {
   const files = analyzeFiles(dir);
   const contacts = analyzeContacts(dir, files);

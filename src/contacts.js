@@ -3,6 +3,7 @@ import readTable from './table.js';
 import { normalizers } from './normalize.js';
 import mergeContacts from './merge.js';
 import { stringifyCsv } from './csv.js';
+import { byPath } from './utils.js';
 import {
   COLUMN_MAP, CONTACT_KEY_FIELDS, CONTACTS_COLUMNS, SOURCES_SEPARATOR, STATUSES, TYPES,
 } from './config.js';
@@ -36,7 +37,6 @@ const readExport = (file) => {
   return { file, records, unmapped };
 };
 
-// Нормализует запись и запоминает значения, которые нормализацию не прошли.
 const normalizeRecord = (record) => {
   const rejected = [];
   const normalized = { ...record };
@@ -50,9 +50,6 @@ const normalizeRecord = (record) => {
   return { record: normalized, rejected };
 };
 
-const byPath = (a, b) => (a.path < b.path ? -1 : Number(a.path > b.path));
-
-// Табличные документы берутся из разбора первой команды, чтобы не считать его дважды.
 export const analyzeContacts = (dir, filesResult = analyzeFiles(dir)) => {
   const exports = filesResult.files
     .filter((file) => file.type === TYPES.table && file.status === STATUSES.document)

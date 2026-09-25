@@ -12,7 +12,6 @@ export const STATUSES = {
   foreign: 'постороннее',
 };
 
-// Расширения, с которыми программа работает. Всё остальное — постороннее.
 export const EXTENSION_TYPES = {
   csv: 'table',
   json: 'table',
@@ -24,8 +23,7 @@ export const EXTENSION_TYPES = {
   xlsx: 'unparsable',
 };
 
-// Подписи форматов: первые байты файла. document — формат документа,
-// который человек может разобрать вручную (скан, pdf, таблица Excel).
+// document: true - файл можно отдать человеку на ручной разбор
 export const SIGNATURES = [
   { format: 'pdf', bytes: [0x25, 0x50, 0x44, 0x46], document: true },
   { format: 'jpeg', bytes: [0xff, 0xd8, 0xff], document: true },
@@ -40,7 +38,6 @@ export const SIGNATURE_LENGTH = 4096;
 
 export const SYSTEM_FILES = ['.ds_store', 'thumbs.db', 'desktop.ini'];
 
-// Слова, которыми помечают копию файла в имени.
 export const COPY_WORDS = ['копия', 'copy', '-'];
 
 export const HASH_ALGORITHM = 'sha256';
@@ -60,18 +57,15 @@ export const REGISTRY_COLUMNS = [
 
 export const LIST_SEPARATOR = ', ';
 
-// Карта соответствий: поле схемы контакта → известные названия колонок (в нижнем регистре).
 export const COLUMN_MAP = {
-  имя: ['имя', 'фио', 'name', 'full name', 'имя и фамилия'],
-  телефон: ['телефон', 'моб. телефон', 'мобильный телефон', 'тел.', 'phone', 'mobile'],
-  почта: ['почта', 'e-mail', 'email', 'mail', 'электронная почта'],
+  имя: ['имя', 'фио', 'name'],
+  телефон: ['телефон', 'моб. телефон', 'phone'],
+  почта: ['почта', 'e-mail', 'email', 'mail'],
 };
 
-// Поля, по которым табличный документ опознаётся как выгрузка контактов.
 export const CONTACT_KEY_FIELDS = ['телефон', 'почта'];
 
-// Заглушки, которые означают «значения нет». Сравниваются в нижнем регистре.
-export const EMPTY_PLACEHOLDERS = ['-', '—', '–', 'null', 'undefined', 'none', 'n/a'];
+export const EMPTY_PLACEHOLDERS = ['-', 'null', 'none', 'n/a'];
 
 export const PHONE = {
   length: 11,

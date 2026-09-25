@@ -1,56 +1,49 @@
 const QUOTE = '"';
 
-export const detectDelimiter = (headerLine) => {
-  const commas = [...headerLine].filter((symbol) => symbol === ',').length;
-  const semicolons = [...headerLine].filter((symbol) => symbol === ';').length;
-  return semicolons > commas ? ';' : ',';
-};
+const countSymbol = (text, symbol) => [...text].filter((item) => item === symbol).length;
 
-// Разбор csv с учётом значений в кавычках.
+const detectDelimiter = (headerLine) => (countSymbol(headerLine, ';') > countSymbol(headerLine, ',') ? ';' : ',');
+
 export const parseCsv = (text) => {
-  const lines = text.split(/\r?\n/);
-  const delimiter = detectDelimiter(lines[0] ?? '');
+  const normalized = text.replaceAll('\r\n', '\n');
+  const delimiter = detectDelimiter(normalized.split('\n')[0]);
   const rows = [];
   let row = [];
   let value = '';
   let quoted = false;
-  const symbols = [...text];
-  symbols.forEach((symbol, index) => {
+
+  for (let i = 0; i < normalized.length; i += 1) {
+    const symbol = normalized[i];
     if (quoted) {
-      if (symbol === QUOTE && symbols[index + 1] === QUOTE) {
+      if (symbol === QUOTE && normalized[i + 1] === QUOTE) {
         value += QUOTE;
-        symbols[index + 1] = '';
+        i += 1;
       } else if (symbol === QUOTE) {
         quoted = false;
       } else {
         value += symbol;
       }
-      return;
-    }
-    if (symbol === QUOTE && value === '') {
+    } else if (symbol === QUOTE && value === '') {
       quoted = true;
     } else if (symbol === delimiter) {
       row.push(value);
       value = '';
     } else if (symbol === '\n') {
-      row.push(value.endsWith('\r') ? value.slice(0, -1) : value);
-      rows.push(row);
+      rows.push([...row, value]);
       row = [];
       value = '';
     } else {
       value += symbol;
     }
-  });
-  if (value !== '' || row.length > 0) {
-    row.push(value.endsWith('\r') ? value.slice(0, -1) : value);
-    rows.push(row);
   }
+  rows.push([...row, value]);
+
   return rows.filter((cells) => cells.some((cell) => cell.trim() !== ''));
 };
 
 const escapeValue = (value) => {
   const text = String(value ?? '');
-  const needsQuotes = [',', QUOTE, '\n', '\r'].some((symbol) => text.includes(symbol));
+  const needsQuotes = [',', QUOTE, '\n'].some((symbol) => text.includes(symbol));
   return needsQuotes ? `${QUOTE}${text.replaceAll(QUOTE, QUOTE + QUOTE)}${QUOTE}` : text;
 };
 

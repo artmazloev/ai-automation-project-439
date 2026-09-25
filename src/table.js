@@ -20,7 +20,6 @@ const readCsvTable = (text) => {
   return { columns, rows };
 };
 
-// Общее чтение табличного документа для обеих команд: { columns, rows }.
 const readTable = (file) => {
   const raw = fs.readFileSync(file.path, 'utf-8');
   const text = raw.startsWith(BOM) ? raw.slice(BOM.length) : raw;
