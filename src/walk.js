@@ -9,8 +9,14 @@ const describeFile = (filePath) => ({
 });
 
 // Единственное место, где программа обходит папку: им пользуются обе команды.
+// Встретив вложенную папку, функция зовёт себя для неё — глубина не ограничена.
 const listFiles = (dir) => fs.readdirSync(dir, { withFileTypes: true })
-  .filter((entry) => entry.isFile())
-  .map((entry) => describeFile(path.join(dir, entry.name)));
+  .flatMap((entry) => {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return listFiles(entryPath);
+    }
+    return entry.isFile() ? [describeFile(entryPath)] : [];
+  });
 
 export default listFiles;
