@@ -1,3 +1,5 @@
+setup: install link
+
 install:
 	npm ci
 
@@ -7,4 +9,4 @@ link:
 lint:
 	npx eslint .
 
-.PHONY: install link lint
+.PHONY: setup install link lint

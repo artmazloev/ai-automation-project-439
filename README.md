@@ -24,8 +24,7 @@
 ```bash
 git clone https://github.com/artmazloev/ai-automation-project-439.git
 cd ai-automation-project-439
-make install
-npm link
+make setup
 ```
 
 Папку с файлами компании нужно положить рядом с кодом, в git она не попадает:
