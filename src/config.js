@@ -39,3 +39,8 @@ export const SIGNATURES = [
 export const SIGNATURE_LENGTH = 4096;
 
 export const SYSTEM_FILES = ['.ds_store', 'thumbs.db', 'desktop.ini'];
+
+// Слова, которыми помечают копию файла в имени.
+export const COPY_WORDS = ['копия', 'copy', '-'];
+
+export const HASH_ALGORITHM = 'sha256';
