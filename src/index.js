@@ -1,4 +1,3 @@
-import runFiles from './files.js';
-import runContacts from './contacts.js';
-
-export { runFiles, runContacts };
+export { runFiles, runContacts } from './commands.js';
+export { analyzeFiles } from './files.js';
+export { analyzeContacts } from './contacts.js';

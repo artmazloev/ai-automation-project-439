@@ -2,12 +2,11 @@ import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import listFiles from './walk.js';
 import readTable from './table.js';
-import writeOutput from './output.js';
 import { stringifyCsv } from './csv.js';
 import { detectStatus, detectType } from './detect.js';
 import { findDuplicateGroups } from './duplicates.js';
 import {
-  HASH_ALGORITHM, LIST_SEPARATOR, OUTPUT_FILES, REGISTRY_COLUMNS, SIGNATURE_LENGTH, STATUSES, TYPES,
+  HASH_ALGORITHM, LIST_SEPARATOR, REGISTRY_COLUMNS, SIGNATURE_LENGTH, STATUSES, TYPES,
 } from './config.js';
 
 const countBy = (items, key, value) => items.filter((item) => item[key] === value).length;
@@ -48,7 +47,7 @@ export const analyzeFiles = (dir) => {
   return { files, groups, stats };
 };
 
-const buildRegistry = (files) => stringifyCsv(REGISTRY_COLUMNS, files.map((file) => [
+export const buildRegistry = (files) => stringifyCsv(REGISTRY_COLUMNS, files.map((file) => [
   file.path,
   file.name,
   file.type,
@@ -66,11 +65,3 @@ export const formatFilesSummary = ({ stats }) => [
   `Документов: ${stats.document}, требуют ручного разбора: ${stats.manual}, посторонних: ${stats.foreign}`,
   `Копий найдено: ${stats.copies} в ${stats.groups} группах`,
 ];
-
-const runFiles = (dir, outDir) => {
-  const result = analyzeFiles(dir);
-  const registryPath = writeOutput(outDir, OUTPUT_FILES.registry, buildRegistry(result.files));
-  return [...formatFilesSummary(result), `Реестр: ${registryPath}`];
-};
-
-export default runFiles;

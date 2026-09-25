@@ -2,10 +2,9 @@ import { analyzeFiles } from './files.js';
 import readTable from './table.js';
 import { normalizers } from './normalize.js';
 import mergeContacts from './merge.js';
-import writeOutput from './output.js';
 import { stringifyCsv } from './csv.js';
 import {
-  COLUMN_MAP, CONTACT_KEY_FIELDS, CONTACTS_COLUMNS, OUTPUT_FILES, SOURCES_SEPARATOR, STATUSES, TYPES,
+  COLUMN_MAP, CONTACT_KEY_FIELDS, CONTACTS_COLUMNS, SOURCES_SEPARATOR, STATUSES, TYPES,
 } from './config.js';
 
 const normalizeColumn = (column) => column.trim().toLowerCase();
@@ -53,8 +52,9 @@ const normalizeRecord = (record) => {
 
 const byPath = (a, b) => (a.path < b.path ? -1 : Number(a.path > b.path));
 
-export const analyzeContacts = (dir) => {
-  const exports = analyzeFiles(dir).files
+// Табличные документы берутся из разбора первой команды, чтобы не считать его дважды.
+export const analyzeContacts = (dir, filesResult = analyzeFiles(dir)) => {
+  const exports = filesResult.files
     .filter((file) => file.type === TYPES.table && file.status === STATUSES.document)
     .toSorted(byPath)
     .map(readExport)
@@ -78,25 +78,24 @@ export const analyzeContacts = (dir) => {
   };
 };
 
-export const formatContactsSummary = ({ exports, stats }) => {
-  const unmapped = exports
-    .flatMap(({ file, unmapped: columns }) => columns.map((column) => `${column} (${file.name})`));
+export const listUnmappedColumns = (exports) => exports
+  .flatMap(({ file, unmapped }) => unmapped.map((column) => ({ column, source: file.name })));
+
+export const formatContactsTotals = ({ stats }) => [
+  `Выгрузок прочитано: ${stats.exports}, записей: ${stats.records}`,
+  `Уникальных контактов: ${stats.unique}`,
+  `Отбраковано значений: ${stats.rejectedValues}, записей без телефона и почты: ${stats.withoutKey}`,
+];
+
+export const formatContactsSummary = (result) => {
+  const unmapped = listUnmappedColumns(result.exports)
+    .map(({ column, source }) => `${column} (${source})`);
   return [
-    ...exports.map(({ file, records }) => `${file.name}: записей ${records.length}`),
-    `Выгрузок прочитано: ${stats.exports}, записей: ${stats.records}`,
-    `Уникальных контактов: ${stats.unique}`,
+    ...result.exports.map(({ file, records }) => `${file.name}: записей ${records.length}`),
+    ...formatContactsTotals(result),
     ...(unmapped.length > 0 ? [`Колонки без соответствия: ${unmapped.join(', ')}`] : []),
-    `Отбраковано значений: ${stats.rejectedValues}, записей без телефона и почты: ${stats.withoutKey}`,
   ];
 };
 
-const buildContactsTable = (contacts) => stringifyCsv(CONTACTS_COLUMNS, contacts
+export const buildContactsTable = (contacts) => stringifyCsv(CONTACTS_COLUMNS, contacts
   .map((contact) => [contact.имя, contact.телефон, contact.почта, contact.источники.join(SOURCES_SEPARATOR)]));
-
-const runContacts = (dir, outDir) => {
-  const result = analyzeContacts(dir);
-  const tablePath = writeOutput(outDir, OUTPUT_FILES.contacts, buildContactsTable(result.contacts));
-  return [...formatContactsSummary(result), `Таблица: ${tablePath}`];
-};
-
-export default runContacts;

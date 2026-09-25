@@ -83,3 +83,5 @@ export const PHONE = {
 export const CONTACTS_COLUMNS = ['имя', 'телефон', 'почта', 'источники'];
 
 export const SOURCES_SEPARATOR = '; ';
+
+export const REPORT_JSON_INDENT = 2;
