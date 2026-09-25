@@ -14,13 +14,13 @@
 
 ## Стек
 
-- JavaScript (Node.js 20+, ES-модули)
+- JavaScript (Node.js 22+, ES-модули)
 - [commander](https://github.com/tj/commander.js) — разбор аргументов и справка
 - ESLint — линтер
 
 ## Установка
 
-Нужны Node.js 20+ и Git.
+Нужны Node.js 22+ и Git.
 
 ```bash
 git clone https://github.com/artmazloev/ai-automation-project-439.git
