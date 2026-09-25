@@ -14,20 +14,44 @@
 
 ## Стек
 
-- JavaScript
+- JavaScript (Node.js 20+, ES-модули)
+- [commander](https://github.com/tj/commander.js) — разбор аргументов и справка
+- ESLint — линтер
 
 ## Установка
 
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
+Нужны Node.js 20+ и Git.
 
 ```bash
 git clone https://github.com/artmazloev/ai-automation-project-439.git
 cd ai-automation-project-439
+npm ci        # или make install
+npm link      # команда file-automation появится в системе
+```
+
+Данные компании в репозиторий не входят (папка `company-files/` в `.gitignore`), их кладут рядом с кодом:
+
+```bash
+git clone --depth 1 https://github.com/hexlet-components/data-company-files.git
+mv data-company-files/company-files company-files
+rm -rf data-company-files
+```
+
+Линтер запускается одной командой:
+
+```bash
+npm run lint  # или make lint
 ```
 
 ## Использование
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+```bash
+file-automation                                          # справка
+file-automation files ./company-files [--out ./out]      # реестр документов
+file-automation contacts ./company-files [--out ./out]   # чистая таблица контактов
+```
+
+Параметр `--out` задаёт папку результата, по умолчанию `./out`.
 
 ---
 

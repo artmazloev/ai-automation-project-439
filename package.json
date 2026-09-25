@@ -1,0 +1,26 @@
+{
+  "name": "file-automation",
+  "version": "1.0.0",
+  "description": "Автоматизация разбора файлов компании",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "file-automation": "bin/file-automation.js"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0"
+  }
+}
