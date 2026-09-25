@@ -69,3 +69,13 @@ export const COLUMN_MAP = {
 
 // Поля, по которым табличный документ опознаётся как выгрузка контактов.
 export const CONTACT_KEY_FIELDS = ['телефон', 'почта'];
+
+// Заглушки, которые означают «значения нет». Сравниваются в нижнем регистре.
+export const EMPTY_PLACEHOLDERS = ['-', '—', '–', 'null', 'undefined', 'none', 'n/a'];
+
+export const PHONE = {
+  length: 11,
+  countryCode: '7',
+  trunkPrefix: '8',
+  digits: '0123456789',
+};

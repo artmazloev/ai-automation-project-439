@@ -1,5 +1,6 @@
 import { analyzeFiles } from './files.js';
 import readTable from './table.js';
+import { normalizers } from './normalize.js';
 import { COLUMN_MAP, CONTACT_KEY_FIELDS, STATUSES, TYPES } from './config.js';
 
 const normalizeColumn = (column) => column.trim().toLowerCase();
@@ -31,6 +32,20 @@ const readExport = (file) => {
   return { file, records, unmapped };
 };
 
+// Нормализует запись и запоминает значения, которые нормализацию не прошли.
+const normalizeRecord = (record) => {
+  const rejected = [];
+  const normalized = { ...record };
+  Object.keys(normalizers).forEach((field) => {
+    const { value, rejected: isRejected } = normalizers[field](record[field]);
+    normalized[field] = value;
+    if (isRejected) {
+      rejected.push({ field, value: record[field].trim(), source: record.источник });
+    }
+  });
+  return { record: normalized, rejected };
+};
+
 const byPath = (a, b) => (a.path < b.path ? -1 : Number(a.path > b.path));
 
 export const analyzeContacts = (dir) => {
@@ -39,12 +54,20 @@ export const analyzeContacts = (dir) => {
     .toSorted(byPath)
     .map(readExport)
     .filter((item) => item !== null);
-  const records = exports.flatMap((item) => item.records);
+  const raw = exports.flatMap((item) => item.records);
+  const normalized = raw.map(normalizeRecord);
+  const rejectedValues = normalized.flatMap((item) => item.rejected);
+  const records = normalized.map((item) => item.record);
+  const withoutKey = records.filter((record) => record.телефон === '' && record.почта === '');
   const stats = {
     exports: exports.length,
-    records: records.length,
+    records: raw.length,
+    rejectedValues: rejectedValues.length,
+    withoutKey: withoutKey.length,
   };
-  return { exports, records, stats };
+  return {
+    exports, records, rejectedValues, withoutKey, stats,
+  };
 };
 
 export const formatContactsSummary = ({ exports, stats }) => {
@@ -54,6 +77,7 @@ export const formatContactsSummary = ({ exports, stats }) => {
     ...exports.map(({ file, records }) => `${file.name}: записей ${records.length}`),
     `Выгрузок прочитано: ${stats.exports}, записей: ${stats.records}`,
     ...(unmapped.length > 0 ? [`Колонки без соответствия: ${unmapped.join(', ')}`] : []),
+    `Отбраковано значений: ${stats.rejectedValues}, записей без телефона и почты: ${stats.withoutKey}`,
   ];
 };
 
