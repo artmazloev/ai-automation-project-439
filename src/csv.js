@@ -50,7 +50,7 @@ export const parseCsv = (text) => {
 
 const escapeValue = (value) => {
   const text = String(value ?? '');
-  const needsQuotes = [',', ';', QUOTE, '\n', '\r'].some((symbol) => text.includes(symbol));
+  const needsQuotes = [',', QUOTE, '\n', '\r'].some((symbol) => text.includes(symbol));
   return needsQuotes ? `${QUOTE}${text.replaceAll(QUOTE, QUOTE + QUOTE)}${QUOTE}` : text;
 };
 

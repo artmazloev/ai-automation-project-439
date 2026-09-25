@@ -1,7 +1,12 @@
 import { analyzeFiles } from './files.js';
 import readTable from './table.js';
 import { normalizers } from './normalize.js';
-import { COLUMN_MAP, CONTACT_KEY_FIELDS, STATUSES, TYPES } from './config.js';
+import mergeContacts from './merge.js';
+import writeOutput from './output.js';
+import { stringifyCsv } from './csv.js';
+import {
+  COLUMN_MAP, CONTACT_KEY_FIELDS, CONTACTS_COLUMNS, OUTPUT_FILES, SOURCES_SEPARATOR, STATUSES, TYPES,
+} from './config.js';
 
 const normalizeColumn = (column) => column.trim().toLowerCase();
 
@@ -58,15 +63,18 @@ export const analyzeContacts = (dir) => {
   const normalized = raw.map(normalizeRecord);
   const rejectedValues = normalized.flatMap((item) => item.rejected);
   const records = normalized.map((item) => item.record);
-  const withoutKey = records.filter((record) => record.телефон === '' && record.почта === '');
+  const hasKey = (record) => record.телефон !== '' || record.почта !== '';
+  const withoutKey = records.filter((record) => !hasKey(record));
+  const contacts = mergeContacts(records.filter(hasKey));
   const stats = {
     exports: exports.length,
     records: raw.length,
+    unique: contacts.length,
     rejectedValues: rejectedValues.length,
     withoutKey: withoutKey.length,
   };
   return {
-    exports, records, rejectedValues, withoutKey, stats,
+    exports, contacts, rejectedValues, withoutKey, stats,
   };
 };
 
@@ -76,11 +84,19 @@ export const formatContactsSummary = ({ exports, stats }) => {
   return [
     ...exports.map(({ file, records }) => `${file.name}: записей ${records.length}`),
     `Выгрузок прочитано: ${stats.exports}, записей: ${stats.records}`,
+    `Уникальных контактов: ${stats.unique}`,
     ...(unmapped.length > 0 ? [`Колонки без соответствия: ${unmapped.join(', ')}`] : []),
     `Отбраковано значений: ${stats.rejectedValues}, записей без телефона и почты: ${stats.withoutKey}`,
   ];
 };
 
-const runContacts = (dir) => formatContactsSummary(analyzeContacts(dir));
+const buildContactsTable = (contacts) => stringifyCsv(CONTACTS_COLUMNS, contacts
+  .map((contact) => [contact.имя, contact.телефон, contact.почта, contact.источники.join(SOURCES_SEPARATOR)]));
+
+const runContacts = (dir, outDir) => {
+  const result = analyzeContacts(dir);
+  const tablePath = writeOutput(outDir, OUTPUT_FILES.contacts, buildContactsTable(result.contacts));
+  return [...formatContactsSummary(result), `Таблица: ${tablePath}`];
+};
 
 export default runContacts;

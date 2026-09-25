@@ -79,3 +79,7 @@ export const PHONE = {
   trunkPrefix: '8',
   digits: '0123456789',
 };
+
+export const CONTACTS_COLUMNS = ['имя', 'телефон', 'почта', 'источники'];
+
+export const SOURCES_SEPARATOR = '; ';
